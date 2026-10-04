@@ -1,4 +1,4 @@
-package main.java.com.example.StudentManagement;
+package com.example.StudentManagement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/Student")
+@RequestMapping("/Students")
 public class StudentController {
     
     private List<Student> students=new  ArrayList<>();

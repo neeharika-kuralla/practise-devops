@@ -1,4 +1,4 @@
-package main.java.com.example.StudentManagement;
+package com.example.StudentManagement;
 public class Student {
     private int id;
     private String name;
