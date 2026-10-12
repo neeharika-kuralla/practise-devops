@@ -15,25 +15,42 @@ pipeline {
         //         checkout scm
         //     }
         // }
-        stage("Build and Push Image"){
-            steps{
+        
+        stage('Build and Push Image') {
+            steps {
                 withCredentials([
                     usernamePassword(
-                    credentialsId:'dockerhub-cred',
-                    usernameVariable:'DOCKERHUB_USER',
-                    passwordVariable:'DOCKERHUB_PASS'
+                        credentialsId: 'dockerhub-cred',
+                        usernameVariable: 'DOCKERHUB_USER',
+                        passwordVariable: 'DOCKERHUB_PASS'
                     )
-                ])
+                ]) {
+                    powershell '''
+                        $env:DOCKERHUB_PASS |
+                            docker login --username $env:DOCKERHUB_USER --password-stdin
 
-                powershell '''
-                    echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                        if ($LASTEXITCODE -ne 0) {
+                            exit 1
+                        }
 
-                    docker build -t "$IMAGE_NAME:$BUILD_NUMBER" .
-                    docker push "$IMAGE_NAME:$BUILD_NUMBER"
-                '''
+                        docker build -t "$env:IMAGE_NAME`:$env:BUILD_NUMBER" .
 
+                        if ($LASTEXITCODE -ne 0) {
+                            exit 1
+                        }
+
+                        docker push "$env:IMAGE_NAME`:$env:BUILD_NUMBER"
+
+                        if ($LASTEXITCODE -ne 0) {
+                            exit 1
+                        }
+
+                        docker logout
+                    '''
+                }
             }
         }
+
 
         stage("Deploy and Test new Environment"){
             steps{
